@@ -68,15 +68,8 @@ ansible-lint site.yml
 # Test
  *  Molecule
  ```
-# install 
+# install
 pip3 install molecule
 ```
 
 # Servers
-*  GPS common server
-   - https://docs.google.com/document/d/1KnTfZSd2UfgvxAB3RgiZoH9MI6zPnslgPEaFwgOp6Js/edit
-*  KVMs
-   - manakamu-work  <-- development
-   - manakamu-cw    <-- Target server
-
-
