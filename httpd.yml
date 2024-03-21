@@ -1,4 +1,5 @@
 ---
-- hosts: web_server
+- name: Install Web Server
+  hosts: web_server
   roles:
      - httpd
