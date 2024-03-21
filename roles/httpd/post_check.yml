@@ -1,0 +1,50 @@
+---
+- name: Check apache is installed
+  command:
+    cmd: "rpm -q {{ httpd_package }}"
+  changed_when: false
+  # 以下、commandモジュール実行時のエラー判定として裏で動いているものを
+  # 動作の確認をよりわかりやすくするためにあえて可視化してみました。
+  # 実際のplaybook構築時は無くても問題ありません。
+  register: _httpd_check_rpm_result
+  failed_when: _httpd_check_rpm_result.rc != 0
+  tags:
+    - skip_ansible_lint
+
+- name: Check apache is enabled
+  command:
+    cmd: "systemctl is-enabled {{ httpd_service }}"
+  changed_when: false
+  register: _httpd_check_systemd_enable_result
+  failed_when: _httpd_check_systemd_enable_result.rc != 0
+  tags:
+    - skip_ansible_lint
+
+- name: Check apache is active
+  command:
+    cmd: "systemctl is-active {{ httpd_service }}"
+  changed_when: false
+  register: _httpd_check_systemd_actvie_result
+  failed_when: _httpd_check_systemd_actvie_result.rc != 0
+  tags:
+    - skip_ansible_lint
+
+- name: Check firewalld is configured
+  command:
+    cmd: "firewall-cmd --list-ports --zone public"
+  changed_when: false
+  register: _httpd_check_firewall_result
+  failed_when: "'%d/tcp' % httpd_port not in _httpd_check_firewall_result.stdout"
+  tags:
+    - skip_ansible_lint
+
+- name: Check apache port is opened
+  wait_for:
+    timeout: 60
+    port: "{{ httpd_port }}"
+    delay: 5
+
+- name: Check http access
+  uri:
+    url: "http://{{ inventory_hostname }}:{{ httpd_port }}/"
+    status_code: 200
