@@ -1,16 +1,16 @@
 ---
-- name: apache_01
+- name: Install apache
   yum:
     name: "{{ httpd_package }}"
     state: present
 
-- name: apache_02
+- name: Start and enable apache
   systemd:
     name: "{{ httpd_service }}"
     state: started
     enabled: true
 
-- name: Put
+- name: Put index.html
   template:
     src: index.html.j2
     dest: "{{ httpd_index_path }}"
@@ -18,12 +18,12 @@
     group: "{{ httpd_group }}"
     mode: "{{ httpd_mode }}"
 
-- name: firewalld_01
+- name: Install firewalld
   yum:
     name: firewalld
     state: present
 
-- name: firewall_02
+- name: Set firewall policy
   firewalld:
     zone: public
     port: "{{ httpd_port }}/tcp"
@@ -31,7 +31,7 @@
     state: enabled
   register: _httpd_firewalld_result
 
-- name: firewalld_03
+- name: Restart firewalld
   systemd:
     name: firewalld.service
     state: restarted
